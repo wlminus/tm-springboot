@@ -1,74 +1,112 @@
 package com.techmaster.wlminus.springboot1;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
-@Controller
+@RestController
 public class AgeController {
 
-    @GetMapping("/level1/{time}")
-    public ResponseEntity<String> level1(@PathVariable("time") Integer unixTimeAge) {
-        try {
-            this.validateInput(unixTimeAge);
+    private int count;
 
-            Date date = new Date(unixTimeAge * 1000L);
-            SimpleDateFormat jdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
-            return ResponseEntity.ok(jdf.format(date));
-        } catch (RuntimeException re) {
-            return ResponseEntity.badRequest().body(re.getMessage());
+    private boolean validate(Long unixTime) {
+        if (unixTime == 0) {
+            throw new RuntimeException("Invalid unixTime: 0 is invalid");
         }
-    }
-
-    private boolean validateInput(Integer unixTimeInput) {
-        if (unixTimeInput == 0) {
-            throw new RuntimeException("Input time invalid: Zero");
+        if (unixTime < 0) {
+            throw new RuntimeException("Invalid unixTime: can not be negative");
         }
-
-        if (unixTimeInput < 0) {
-            throw new RuntimeException("Input time invalid: Negative");
-        }
-
         return true;
     }
 
-    @PatchMapping("/level2")
-    public ResponseEntity<String> level2(@RequestParam("time") Integer unixTimeAge) {
+    @GetMapping("/level1/{unixTime}")
+    public ResponseEntity<String> convertTimeUnixToNormal(@PathVariable("unixTime") Long unixTime) {
         try {
-            this.validateInput(unixTimeAge);
-
-            long now = Instant.now().getEpochSecond();
-            var different = now - unixTimeAge;
-            var year = different / 31556926;
-            var day = different / 86400;
-            return ResponseEntity.ok("Year: " + year + " Day: " + day);
-        } catch (RuntimeException re) {
-            return ResponseEntity.badRequest().body(re.getMessage());
+            validate(unixTime);
+            Date date = new Date(unixTime * 1000L);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String formattedDate = sdf.format(date);
+            return ResponseEntity.ok(formattedDate);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    @ResponseBody
-    public String hello() {
-        return "World";
+    @GetMapping("/level2/{unixTime}")
+    public ResponseEntity<String> getYearsAndDays(@PathVariable("unixTime") Long unixTime) {
+        try {
+            Instant instant = Instant.ofEpochSecond(unixTime);
+            LocalDate date = LocalDate.ofInstant(instant, ZoneId.of("UTC"));
+            return ResponseEntity.ok("Years: " + (LocalDate.now().getYear() - date.getYear()) + "\n"
+                    + "Days: " + ChronoUnit.DAYS.between(date, LocalDate.now()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
+    @PostMapping("/level3/{unixTimePath}")
+    public ResponseEntity<String> level3(
+            @PathVariable(value = "unixTimePath", required = false) Long unixTimePath,
+            @RequestParam(required = false) Long unixTimeParam,
+            @RequestHeader(value = "unixHeader", required = false) Long unixHeader,
+            @RequestBody(required = false) Long unixBody
+    ) {
+        try {
+            validate(unixTimePath);
+            Instant instant = Instant.ofEpochSecond(unixTimePath);
 
+            if (unixTimeParam != null) {
+                validate(unixTimeParam);
+                instant = Instant.ofEpochSecond(unixTimeParam);
+            }
+            if (unixHeader != null) {
+                validate(unixHeader);
+                instant = Instant.ofEpochSecond(unixHeader);
+            }
+            if (unixBody != null) {
+                validate(unixBody);
+                instant = Instant.ofEpochSecond(unixBody);
+            }
+            LocalDate date = LocalDate.ofInstant(instant, ZoneId.of("UTC"));
+            return ResponseEntity.ok("Years: " + (LocalDate.now().getYear() - date.getYear()) + "\n"
+                    + "Days: " + ChronoUnit.DAYS.between(date, LocalDate.now()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
-//    private List<Integer> numberOfDayInMonth;
-//    private static String convertUnixTimeToDate(Integer unixTime) {
-//        Integer year = unixTime / 31556926;
-//        Integer trueYear = year + 1970;
-//
-//        Integer numberOfDayFrom1970 = unixTime / 86400;
-//        return trueYear.toString();
-//    }
-//
-//    public static void main(String[] args) {
-//        System.out.println(convertUnixTimeToDate(1659104458));
-//    }
+    @GetMapping("/level4")
+    public ResponseEntity<String> level4(@RequestParam("stringTime") String str) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate date = LocalDate.parse(str, formatter);
+            return ResponseEntity.ok("Years: " + (LocalDate.now().getYear() - date.getYear()) + "\n"
+                    + " - Days: " + ChronoUnit.DAYS.between(date, LocalDate.now()));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Incorrect format String" + e.getMessage());
+        }
+    }
+
+    @GetMapping("/level5")
+    public ResponseEntity<String> level5(@RequestParam("stringTime") String str) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate date = LocalDate.parse(str, formatter);
+            count++;
+            return ResponseEntity.ok("Years: " + (LocalDate.now().getYear() - date.getYear()) + "\n"
+                    + " - Days: " + ChronoUnit.DAYS.between(date, LocalDate.now()) + "\n"
+                    + " - Count: " + count);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body("Incorrect format String" + e.getMessage());
+        }
+
+    }
 }
