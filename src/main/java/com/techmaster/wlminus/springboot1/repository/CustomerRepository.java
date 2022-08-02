@@ -15,7 +15,9 @@ public class CustomerRepository {
     }
 
     public Optional<Customer> getById(Integer id) {
-        return FakeDB.database.stream().filter(f -> Objects.equals(f.getId(), id)).findAny();
+        return FakeDB.database.stream()
+                .filter(f -> Objects.equals(f.getId(), id))
+                .findAny();
     }
 
     public Customer add(Customer customer) {
@@ -24,7 +26,7 @@ public class CustomerRepository {
     }
 
     public Customer updateById(Integer id, Customer newCustomer) {
-        var oldCustomer = this.getById(id);
+        Optional<Customer> oldCustomer = this.getById(id);
         if (oldCustomer.isPresent()) {
             var realCustomer = oldCustomer.get();
             realCustomer.setId(newCustomer.getId());
@@ -38,7 +40,7 @@ public class CustomerRepository {
         }
     }
 
-    public void deleteById(Integer id) {
-        FakeDB.database.removeIf(customer -> Objects.equals(customer.getId(), id));
+    public boolean deleteById(Integer id) {
+        return FakeDB.database.removeIf(customer -> Objects.equals(customer.getId(), id));
     }
 }
