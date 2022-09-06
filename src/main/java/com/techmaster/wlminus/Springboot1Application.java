@@ -1,4 +1,4 @@
-package com.techmaster.wlminus.springboot1;
+package com.techmaster.wlminus;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

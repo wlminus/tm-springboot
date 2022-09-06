@@ -1,4 +1,4 @@
-package com.techmaster.wlminus.springboot1.model;
+package com.techmaster.wlminus.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

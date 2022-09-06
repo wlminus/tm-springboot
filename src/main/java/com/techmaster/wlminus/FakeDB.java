@@ -1,6 +1,6 @@
-package com.techmaster.wlminus.springboot1;
+package com.techmaster.wlminus;
 
-import com.techmaster.wlminus.springboot1.model.Customer;
+import com.techmaster.wlminus.model.Customer;
 
 import java.util.ArrayList;
 import java.util.List;

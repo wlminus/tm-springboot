@@ -1,4 +1,4 @@
-package com.techmaster.wlminus.springboot1;
+package com.techmaster.wlminus.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

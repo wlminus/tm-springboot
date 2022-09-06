@@ -1,7 +1,7 @@
-package com.techmaster.wlminus.springboot1.repository;
+package com.techmaster.wlminus.repository;
 
-import com.techmaster.wlminus.springboot1.FakeDB;
-import com.techmaster.wlminus.springboot1.model.Customer;
+import com.techmaster.wlminus.FakeDB;
+import com.techmaster.wlminus.model.Customer;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

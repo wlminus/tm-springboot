@@ -1,4 +1,4 @@
-package com.techmaster.wlminus.springboot1;
+package com.techmaster.wlminus;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
